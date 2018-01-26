@@ -1,20 +1,21 @@
-const fileUpload = require('express-fileupload');
+var express = require('express');
+var router = express.Router();
 const _ = require('lodash');
 const btoa = require('btoa');
-const express = require('express');
-const router = express.Router();
-router.use(fileUpload());
+// var upload = multer(); // for parsing multipart/form-data
+const fileUpload = require('express-fileupload');
+
 
 const AWS = require('aws-sdk');
 const credentials = require('../credentials.json').AWS;
+
+AWS.config.credentials = new AWS.Credentials(credentials);
+AWS.config.region = credentials.region;
+
 const s3 = new AWS.S3({
     params: {Bucket: credentials.Bucket},
 });
 const rekognition = new AWS.Rekognition();
-
-
-AWS.config.credentials = new AWS.Credentials(credentials);
-AWS.config.region = credentials.region;
 
 
 const retrieveImage = async (key) => {
@@ -40,10 +41,13 @@ const getImage = async (image)=> {
     const b64encoded = btoa(Uint8ToString(retrievedImage));
     image.src = `data:image/jpeg;base64,${b64encoded}`;
     return image;
-};
+}
 
 
-router.get('/', async function (req, res) {
+
+
+/* GET home page. */
+router.get('/', async function (req, res, next) {
     const credentials = require('../credentials.json').AWS;
     const params = {
         Bucket: credentials.Bucket,
@@ -55,7 +59,7 @@ router.get('/', async function (req, res) {
     res.json(result);
 });
 
-router.get('/:name', async function (req, res) {
+router.get('/:name', async function (req, res, next) {
     try {
         const image = await retrieveImage(req.params.name);
         const b64encoded = btoa(Uint8ToString(image));
@@ -72,7 +76,7 @@ router.get('/:name', async function (req, res) {
     }
 });
 
-router.get('/:name/rekognize', async function (req, res) {
+router.get('/:name/rekognize', async function (req, res, next) {
     const params = {
         Image: {
             S3Object: {
@@ -94,7 +98,7 @@ router.get('/:name/rekognize', async function (req, res) {
     });
 });
 
-router.post('/', async function (req, res) {
+router.post('/', async function (req, res, next) {
     const file = req.files.file;
     const params = {
         Key: file.name,
@@ -113,7 +117,7 @@ router.post('/', async function (req, res) {
     }
 });
 
-router.delete('/:key', async function (req, res) {
+router.delete('/:key', async function (req, res, next) {
     const params = {
         Bucket: credentials.Bucket,
         Key: req.params.key,
