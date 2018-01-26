@@ -1,0 +1,6 @@
+
+.idea/
+credentials.json
+files/
+node_modules/
+package.json
