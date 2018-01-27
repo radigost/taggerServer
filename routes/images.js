@@ -3,7 +3,9 @@ var router = express.Router();
 const _ = require('lodash');
 const btoa = require('btoa');
 // var upload = multer(); // for parsing multipart/form-data
-const fileUpload = require('express-fileupload');
+let fileUpload = require('express-fileupload');
+router.use(fileUpload());
+
 
 
 const AWS = require('aws-sdk');
@@ -42,8 +44,6 @@ const getImage = async (image)=> {
     image.src = `data:image/jpeg;base64,${b64encoded}`;
     return image;
 }
-
-
 
 
 /* GET home page. */
@@ -99,15 +99,16 @@ router.get('/:name/rekognize', async function (req, res, next) {
 });
 
 router.post('/', async function (req, res, next) {
-    const file = req.files.file;
-    const params = {
-        Key: file.name,
-        Body: file.data,
-        ACL: 'public-read-write',
-    };
+
     let data;
 
     try {
+        const file = req.files.file;
+        const params = {
+            Key: file.name,
+            Body: file.data,
+            ACL: 'public-read-write',
+        };
         data = await s3.upload(params).promise();
         res.json(data);
     }
