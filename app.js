@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 // app.use('/users', users);
 app.use('/api/images', images);
-app.use('/api/stocks/sutterstock', stocks);
+app.use('/api/stocks/shutterstock', stocks);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

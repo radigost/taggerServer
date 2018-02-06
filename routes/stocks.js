@@ -22,12 +22,55 @@ router.get('/', async function (req, res) {
           category,
         },
       });
+      console.log({query,
+        page,
+        sort:'relevance',
+        category})
     } catch (err) {
       console.log(err);
     }
     return res.data;
   };
-  const result = await findShutterstockImages(req.params.query,req.params.page,req.params.category);
+  const result = await findShutterstockImages(req.query.query,req.query.page,req.query.category);
+  res.json(result.data);
+});
+
+
+router.get('/categories', async function (req, res) {
+  const getShutterstockCategories = async () => {
+    let res = { data: [] };
+    try {
+      res = await axios.get('https://api.shutterstock.com/v2/images/categories',{
+        auth: {
+          username: credentials.client_id,
+          password: credentials.client_secret,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+    return res.data;
+  };
+  const result = await getShutterstockCategories();
+  res.json(result.data);
+});
+
+router.get('/collections', async function (req, res) {
+  const getShutterstockCollections = async () => {
+    let res = { data: [] };
+    try {
+      res = await axios.get('https://api.shutterstock.com/v2/images/collections',{
+        auth: {
+          username: credentials.client_id,
+          password: credentials.client_secret,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+    }
+    return res.data;
+  };
+  const result = await getShutterstockCollections();
   res.json(result.data);
 });
 
