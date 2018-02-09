@@ -5,6 +5,7 @@ const btoa = require('btoa');
 // var upload = multer(); // for parsing multipart/form-data
 let fileUpload = require('express-fileupload');
 router.use(fileUpload());
+const fs = require('fs');
 
 
 
@@ -18,6 +19,26 @@ const s3 = new AWS.S3({
     params: {Bucket: credentials.Bucket},
 });
 const rekognition = new AWS.Rekognition();
+
+
+// const file = fs.readFileSync('files/user1/1d654de28e9bb92be0776b35157b1560.jpg');
+// const params = {
+//     Image: {
+//         Bytes:file,
+//     },
+//     MaxLabels: 123,
+//     MinConfidence: 70,
+// };
+// rekognition.detectLabels(params, (err, data) => {
+//     if (err) {
+//         console.error(err);
+//     }
+//     else {
+//         console.log(data);
+//     }
+// });
+
+
 
 
 const retrieveImage = async (key) => {
@@ -49,9 +70,7 @@ const getImage = async (image)=> {
 /* GET home page. */
 router.get('/', async function (req, res, next) {
     const credentials = require('../credentials.json').AWS;
-    const params = {
-        Bucket: credentials.Bucket,
-    };
+    const params = {Bucket: credentials.Bucket};
     const data = await s3.listObjects(params).promise();
     const files = data.Contents;
     const promises = _.map(files, file => getImage(file));
