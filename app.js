@@ -1,5 +1,10 @@
 const express = require('express');
 const path = require('path');
+
+const fs = require('fs');
+const  dotenv = require('dotenv');
+if (fs.existsSync('.env')) dotenv.load();
+
 // const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');

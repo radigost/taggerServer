@@ -1,5 +1,5 @@
 
 .idea/
-credentials.json
 files/
 node_modules/
+/.env
