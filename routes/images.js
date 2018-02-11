@@ -16,6 +16,7 @@ const credentials = {
 };
 AWS.config.credentials = new AWS.Credentials(credentials);
 AWS.config.region = credentials.region;
+
 const s3 = new AWS.S3({
     params: {Bucket: credentials.Bucket},
 });

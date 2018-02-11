@@ -1,14 +1,21 @@
 image: node
 
-before_script:
-  - npm install
-
 cache:
   paths:
     - node_modules/
 
-pages:
-  script:
-    - npm run start
+deploy_to_dev_aws:
   only:
     - master
+  script:
+    - echo "$EC2_SSH_KEY" >> "key.pem"
+    - chmod 600 key.pem
+    - ssh -T -i key.pem -o StrictHostKeyChecking=no ubuntu@$EC2_HOST_IP <<EOF
+    - cd ~/server
+    - docker-compose down
+    - git checkout master -f
+    - git pull
+    - docker-compose up -d
+    - logout
+    - EOF
+  stage: build
