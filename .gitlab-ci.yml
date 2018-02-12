@@ -10,7 +10,7 @@ deploy_to_dev_aws:
   script:
     - echo "$EC2_SSH_KEY" > "key.pem"
     - chmod 600 key.pem
-    - echo "$EC2_SSH_KEY" 
+    - echo $EC2_SSH_KEY
     - cat key.pem
     - ssh-keygen -y -v -f  key.pem > key.pub
     - pip install awscli
