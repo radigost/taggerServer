@@ -8,7 +8,7 @@ deploy_to_dev_aws:
   only:
     - master
   script:
-    - echo "$EC2_SSH_KEY" >> "key.pem"
+    - echo "$EC2_SSH_KEY" > "key.pem"
     - chmod 600 key.pem
     - mkdir ~/.ssh/
     - ssh-keygen -y -v -f  key.pem > ~/.ssh/aws.pub
