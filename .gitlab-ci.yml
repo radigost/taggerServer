@@ -10,6 +10,7 @@ deploy_to_dev_aws:
   script:
     - echo "$EC2_SSH_KEY" >> "key.pem"
     - chmod 600 key.pem
+    - ssh-keygen -y -f key.pem > ~/.ssh/aws.pub
     - ssh -T -v -i key.pem -o StrictHostKeyChecking=no ubuntu@$EC2_HOST_IP <<EOF
     - cd ~/server
     - docker-compose down
