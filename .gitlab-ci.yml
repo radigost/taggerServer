@@ -10,7 +10,10 @@ deploy_to_dev_aws:
   script:
     - echo "$EC2_SSH_KEY" >> "key.pem"
     - chmod 600 key.pem
+    - mkdir ~/.ssh/
     - ssh-keygen -y -f key.pem > ~/.ssh/aws.pub
+    - pip install awscli
+    - aws ec2 import-key-pair --key-name <aws.pub> --public-key-material file://~/.ssh/aws.pub --region $AWS_REGION 
     - ssh -T -v -i key.pem -o StrictHostKeyChecking=no ubuntu@$EC2_HOST_IP <<EOF
     - cd ~/server
     - docker-compose down
