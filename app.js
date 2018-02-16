@@ -10,10 +10,6 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-const index = require('./routes/index');
-// const users = require('./routes/users');
-const images = require('./routes/images');
-const stocks = require('./routes/stocks');
 
 const app = express();
 
@@ -36,16 +32,25 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
+const index = require('./routes/index');
 app.use('/', index);
-// app.use('/users', users);
+
+const images = require('./routes/images');
 app.use('/api/images', images);
+
+const translate = require('./routes/translate');
+app.use('/api/translate', translate);
+
+const stocks = require('./routes/stocks');
 app.use('/api/stocks/shutterstock', stocks);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     const err = new Error('Not Found');
     err.status = 404;
-  next(err);
+next(err);
 });
 
 // error handler
