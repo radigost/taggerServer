@@ -4,3 +4,8 @@ files/
 node_modules/
 /.env
 /imageServerNode.iml
+radigost-632eab4044fb.json
+key.pem
+build.sh
+build.env
+aws.pub
