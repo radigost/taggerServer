@@ -1,6 +1,5 @@
-
+files/user1/**
 .idea/
-files/
 node_modules/
 /.env
 /imageServerNode.iml

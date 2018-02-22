@@ -9,7 +9,9 @@ const fs = require('fs');
 const path = require('path');
 const user = require('../models/user');
 const userPath = `../files/${user.path}`;
+var ip = require('ip');
 
+const host = ip.address() // my ip address
 
 const AWS = require('aws-sdk');
 const credentials = {
@@ -55,6 +57,15 @@ const getImage = async (image)=> {
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
+    if (!fs.existsSync(path.join(__dirname,userPath))){
+        try {
+            fs.mkdirSync(path.join(__dirname,'../files'));
+            fs.mkdirSync(path.join(__dirname,userPath));
+          } catch (err) {
+              console.error(err);
+            if (err.code !== 'EEXIST') throw err
+          }
+    }
     fs.readdir(path.join(__dirname,userPath),async(err,files)=>{
         if (err) {
             console.error(err);
@@ -63,7 +74,7 @@ router.get('/', async function (req, res, next) {
         else {
             const resFiles = files.map((file)=>({
                 Key:`${file}`,
-                src:`http://localhost:3000/files/${file}`})
+                src:`http://${host}:3000/files/${file}`})
             );
             res.json(resFiles);
         }
@@ -74,7 +85,7 @@ router.get('/:name', async function (req, res, next) {
     try {
         const resFile = {
             Key:`${req.params.name}`,
-            src:`http://localhost:3000/files/${req.params.name}`
+            src:`http://${host}:3000/files/${req.params.name}`
         };
         res.json(resFile);
     }
