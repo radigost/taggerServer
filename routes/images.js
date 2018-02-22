@@ -5,7 +5,10 @@ const btoa = require('btoa');
 
 let fileUpload = require('express-fileupload');
 router.use(fileUpload());
-
+const fs = require('fs');
+const path = require('path');
+const user = require('../models/user');
+const userPath = `../files/${user.path}`;
 
 
 const AWS = require('aws-sdk');
@@ -22,26 +25,6 @@ const s3 = new AWS.S3({
     params: {Bucket: credentials.Bucket},
 });
 const rekognition = new AWS.Rekognition();
-
-
-// const file = fs.readFileSync('files/user1/1d654de28e9bb92be0776b35157b1560.jpg');
-// const params = {
-//     Image: {
-//         Bytes:file,
-//     },
-//     MaxLabels: 123,
-//     MinConfidence: 70,
-// };
-// rekognition.detectLabels(params, (err, data) => {
-//     if (err) {
-//         console.error(err);
-//     }
-//     else {
-//         console.log(data);
-//     }
-// });
-
-
 
 
 const retrieveImage = async (key) => {
@@ -72,26 +55,28 @@ const getImage = async (image)=> {
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
-    const params = {
-        Bucket: credentials.Bucket,
-    };
-    const data = await s3.listObjects(params).promise();
-    const files = data.Contents;
-    const promises = _.map(files, file => getImage(file));
-    const result = await Promise.all(promises);
-    res.json(result);
+    fs.readdir(path.join(__dirname,userPath),async(err,files)=>{
+        if (err) {
+            console.error(err);
+            next();
+        }
+        else {
+            const resFiles = files.map((file)=>({
+                Key:`${file}`,
+                src:`http://localhost:3000/files/${file}`})
+            );
+            res.json(resFiles);
+        }
+    });
 });
 
 router.get('/:name', async function (req, res, next) {
     try {
-        const image = await retrieveImage(req.params.name);
-        const b64encoded = btoa(Uint8ToString(image));
-        const result = {
-            image,
-            Key: req.params.name,
-            src: `data:image/jpeg;base64,${b64encoded}`,
+        const resFile = {
+            Key:`${req.params.name}`,
+            src:`http://localhost:3000/files/${req.params.name}`
         };
-        res.json(result)
+        res.json(resFile);
     }
     catch (err) {
         console.error(err);
@@ -100,16 +85,34 @@ router.get('/:name', async function (req, res, next) {
 });
 
 router.get('/:name/rekognize', async function (req, res, next) {
+    const file = fs.readFileSync(path.join(__dirname,userPath,req.params.name));
+    const stat = fs.statSync(path.join(__dirname,userPath,req.params.name));
+    const MAX_SIZE_WITHOUT_BUCKET =  5242880;  
     const params = {
-        Image: {
-            S3Object: {
-                Bucket: credentials.Bucket,
-                Name: req.params.name,
-            },
-        },
         MaxLabels: 123,
         MinConfidence: 70,
     };
+
+    if(stat.size<MAX_SIZE_WITHOUT_BUCKET){
+        params.Image= {
+            Bytes:file
+        };
+    }
+    else{
+        const par = {
+            Key: req.params.name,
+            Body: file,
+            ACL: 'public-read-write',
+        };
+        data = await s3.upload(par).promise();
+        
+        params.Image =  {
+            S3Object:{
+                Bucket: credentials.Bucket,
+                Name: req.params.name,
+            }
+        };
+    }
     rekognition.detectLabels(params, (err, data) => {
         if (err) {
             res.status(500);
@@ -119,21 +122,20 @@ router.get('/:name/rekognize', async function (req, res, next) {
             res.json(data.Labels);
         }
     });
+   
 });
 
 router.post('/', async function (req, res, next) {
-
     let data;
-
     try {
         const file = req.files.file;
-        const params = {
-            Key: file.name,
-            Body: file.data,
-            ACL: 'public-read-write',
-        };
-        data = await s3.upload(params).promise();
-        res.json(data);
+        fs.writeFile(path.join(__dirname,userPath,file.name), file.data, (err) => {  
+            if (err) {
+                console.error(err);
+                throw err;
+            }
+            res.json({ Key: file.name});
+        });
     }
     catch (err) {
         res.status(500);
@@ -146,9 +148,18 @@ router.delete('/:key', async function (req, res, next) {
         Bucket: credentials.Bucket,
         Key: req.params.key,
     };
-    const result = await  s3.deleteObject(params)
+    try{
+        const result = await  s3.deleteObject(params)
         .promise();
+    fs.unlinkSync(path.join(__dirname,userPath,req.params.key));
     res.json(result);
+    }
+    catch(err){
+        console.error(err);
+        res.status(500);
+        res.render('error', {error: err})
+    }
+    
 });
 
 

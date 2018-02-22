@@ -9,7 +9,7 @@ if (fs.existsSync('.env')) dotenv.load();
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-
+const user = require('./models/user')
 
 
 const app = express();

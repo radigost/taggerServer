@@ -9,3 +9,4 @@ key.pem
 build.sh
 build.env
 aws.pub
+npm-debug.log
