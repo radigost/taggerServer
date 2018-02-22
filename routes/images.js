@@ -9,10 +9,11 @@ const fs = require('fs');
 const path = require('path');
 const user = require('../models/user');
 const userPath = `../files/${user.path}`;
-var ip = require('ip');
+//var ip =process.env.IP || 'localhost';
+//console.log(ip)
 
-const host = ip.address() // my ip address
-
+const host = process.env.IP || 'localhost' // my ip address
+console.log(host)
 const AWS = require('aws-sdk');
 const credentials = {
     "accessKeyId": process.env.AWS_ACCESS_KEY_ID,
