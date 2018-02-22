@@ -22,12 +22,10 @@ router.get('/', async function (req, res) {
           page,
           sort:'relevance',
           category,
+          image_type:'photo',
+          per_page:40
         },
       });
-      console.log({query,
-        page,
-        sort:'relevance',
-        category})
     } catch (err) {
       console.log(err);
     }
