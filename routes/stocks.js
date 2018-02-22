@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const credentials = require('../credentials.json').Shutterstock;
-
+const credentials ={
+    "client_id": process.env.SHUTTERSTOCK_CLIENT_ID,
+    "client_secret": process.env.SHUTTERSTOCK_SECRET,
+}
 
 /* GET home page. */
 router.get('/', async function (req, res) {
   const findShutterstockImages = async (query, page = 1, category='13') => {
-    
+
     let res = { data: [] };
     try {
       res = await axios.get('https://api.shutterstock.com/v2/images/search',{
@@ -20,12 +22,10 @@ router.get('/', async function (req, res) {
           page,
           sort:'relevance',
           category,
+          image_type:'photo',
+          per_page:40
         },
       });
-      console.log({query,
-        page,
-        sort:'relevance',
-        category})
     } catch (err) {
       console.log(err);
     }

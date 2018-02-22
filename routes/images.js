@@ -2,16 +2,19 @@ var express = require('express');
 var router = express.Router();
 const _ = require('lodash');
 const btoa = require('btoa');
-// var upload = multer(); // for parsing multipart/form-data
+
 let fileUpload = require('express-fileupload');
 router.use(fileUpload());
-const fs = require('fs');
 
 
 
 const AWS = require('aws-sdk');
-const credentials = require('../credentials.json').AWS;
-
+const credentials = {
+    "accessKeyId": process.env.AWS_ACCESS_KEY_ID,
+    "secretAccessKey": process.env.AWS_SECRET_ACCESS_KEY,
+    "region": process.env.AWS_REGION,
+    "Bucket": process.env.AWS_BUCKET,
+};
 AWS.config.credentials = new AWS.Credentials(credentials);
 AWS.config.region = credentials.region;
 
@@ -69,8 +72,9 @@ const getImage = async (image)=> {
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
-    const credentials = require('../credentials.json').AWS;
-    const params = {Bucket: credentials.Bucket};
+    const params = {
+        Bucket: credentials.Bucket,
+    };
     const data = await s3.listObjects(params).promise();
     const files = data.Contents;
     const promises = _.map(files, file => getImage(file));

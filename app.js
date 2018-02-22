@@ -1,15 +1,16 @@
 const express = require('express');
 const path = require('path');
+
+const fs = require('fs');
+const  dotenv = require('dotenv');
+if (fs.existsSync('.env')) dotenv.load();
+
 // const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-const index = require('./routes/index');
-// const users = require('./routes/users');
-const images = require('./routes/images');
-const stocks = require('./routes/stocks');
-const files = require('./routes/files');
+
 
 const app = express();
 
@@ -32,12 +33,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const user = require('./models/user')
+
+
+const index = require('./routes/index');
+const files = require('./routes/files');
 app.use('/files',express.static(path.join(__dirname, `files/${user.path}/`)));
 
 app.use('/', index);
-// app.use('/users', users);
+
+const images = require('./routes/images');
 app.use('/api/images', images);
+
+const translate = require('./routes/translate');
+app.use('/api/translate', translate);
+
+const stocks = require('./routes/stocks');
 app.use('/api/stocks/shutterstock', stocks);
 app.use('/api/files', files);
 
@@ -45,7 +55,7 @@ app.use('/api/files', files);
 app.use(function(req, res, next) {
     const err = new Error('Not Found');
     err.status = 404;
-  next(err);
+next(err);
 });
 
 // error handler
