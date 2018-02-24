@@ -12,7 +12,7 @@ services:
       # - postgres
     env_file:
       - .env
-    environment:
+    #environment:
       #- GOOGLE_APPLICATION_CREDENTIALS="${GOOGLE_CREDENTIALS_FILE_NAME}"
       # AWS_SECRET_ACCESS_KEY:"${AWS_SECRET_ACCESS_KEY}"
       # AWS_REGION:"${AWS_REGION}"
