@@ -20,7 +20,7 @@ router.get('/', async function (req, res) {
         params: {
           query,
           page,
-          sort:'relevance',
+          sort:'popular',
           category,
           image_type:'photo',
           per_page:40
