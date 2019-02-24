@@ -23,7 +23,7 @@ router.get('/', async function (req, res) {
           sort:'popular',
           category,
           image_type:'photo',
-          per_page:40
+          per_page:20
         },
       });
     } catch (err) {
